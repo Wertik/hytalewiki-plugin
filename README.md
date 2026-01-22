@@ -14,7 +14,13 @@ Drawbacks:
 | `/wiki`                                   | provides a base link to the wiki                                                                                   |
 | `/wiki hand [--ui]`                       | open page for item in hand                                                                                         |
 | `/wiki <search term> [--ui]`              | search the wiki for the most relevant entries, looks for exact matches; if exact match and `--ui`, open in-game UI |
-| `/wiki page <page key/page title> [--ui]` | open the page directly with no search                                                                              | 
+| `/wiki page <page key/page title> [--ui]` | open the page directly with no search                                                                              |
+
+## Showcase
+![showcase_hand.png](assets/showcase_hand.png)
+![showcase_page.png](assets/showcase_page.png)
+![showcase_page_not_exist.png](assets/showcase_page_not_exist.png)
+![showcase_search_results.png](assets/showcase_search_results.png)
 
 ## UI
 
