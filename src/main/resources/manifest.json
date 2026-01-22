@@ -1,14 +1,14 @@
 {
-    "Group": "Example",
-    "Name": "ExamplePlugin",
-    "Version": "0.0.2",
-    "Description": "An example plugin for HyTale!",
+    "Group": "Devport",
+    "Name": "HytaleWiki",
+    "Version": "0.0.1",
+    "Description": "Hytale Wiki plugin.",
     "Authors": [
         {
-            "Name": "It's you!"
+            "Name": "Wertiik"
         }
     ],
-    "Website": "example.org",
+    "Website": "https://hytalewiki.org",
     "ServerVersion": "*",
     "Dependencies": {
         
@@ -17,6 +17,6 @@
         
     },
     "DisabledByDefault": false,
-    "Main": "org.example.plugin.ExamplePlugin",
-    "IncludesAssetPack": true
+    "Main": "org.hytalewiki.HytaleWikiPlugin",
+    "IncludesAssetPack": false
 }
