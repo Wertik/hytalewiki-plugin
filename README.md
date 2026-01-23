@@ -1,6 +1,6 @@
 # Hytale Wiki plugin
 
-Allows the player to search the wiki in-game. Provides links to best results or previews the wiki page in-game.
+Allows the player to search the wiki in-game.
 
 Drawbacks:
 
