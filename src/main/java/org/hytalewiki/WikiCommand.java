@@ -137,7 +137,7 @@ public class WikiCommand extends AbstractAsyncCommand {
                 return CompletableFuture.failedFuture(e);
             }
 
-            final SearchEntry exactMatch = parent.findExactMatch(result, term);
+            final SearchEntry exactMatch = parent.findExactMatch(result, query);
 
             Message message = parent.makeHeader("Results");
 
@@ -207,7 +207,7 @@ public class WikiCommand extends AbstractAsyncCommand {
             }
 
             if (page == null || page.getKey() == null) {
-                context.sendMessage(message.insert(makeCreateNotice(key)));
+                context.sendMessage(message.insert(makeCreateNotice(query)));
                 return CompletableFuture.completedFuture(null);
             }
 
