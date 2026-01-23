@@ -1,15 +1,14 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
 plugins {
     id 'java'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.3'
 }
 
-ext {
-//    hytaleHome = "${System.getProperty("user.home")}/AppData/Roaming/Hytale"
-    hytaleHome = "${System.getProperty("user.home")}/lib/hytale/2026.01.13-50e69c385"
-}
-
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(java_version)
+
     withSourcesJar()
     withJavadocJar()
 }
@@ -21,27 +20,25 @@ javadoc {
 
 repositories {
     mavenCentral()
-    mavenLocal()
 
     maven { url "https://www.cursemaven.com" }
+
+    mavenLocal()
+
+    maven { url "https://maven.hytale.com/release" }
+    maven { url "https://maven.hytale.com/pre-release" }
 }
 
 // Adds the Hytale server as a build dependency, allowing you to reference and
 // compile against their code. This requires you to have Hytale installed using
 // the official launcher for now.
 dependencies {
-    implementation(files("$hytaleHome/Server/HytaleServer.jar"))
+    implementation("com.hypixel.hytale:Server:2026.01.22-6f8bdbdc4")
 
     testImplementation(platform("org.junit:junit-bom:6.0.2"))
 
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-// Create the working directory to run the server if it does not already exist.
-def serverRunDir = file("$projectDir/run")
-if (!serverRunDir.exists()) {
-    serverRunDir.mkdirs()
 }
 
 // Updates the manifest.json file with the latest properties defined in the
@@ -53,10 +50,10 @@ tasks.register('updatePluginManifest') {
         if (!manifestFile.exists()) {
             throw new GradleException("Could not find manifest.json at ${manifestFile.path}!")
         }
-        def manifestJson = new groovy.json.JsonSlurper().parseText(manifestFile.text)
+        def manifestJson = new JsonSlurper().parseText(manifestFile.text)
         manifestJson.Version = version
         manifestJson.IncludesAssetPack = includes_pack.toBoolean()
-        manifestFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(manifestJson))
+        manifestFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(manifestJson))
     }
 }
 
@@ -69,9 +66,23 @@ tasks.named('processResources') {
 // your plugin and the default assets.
 idea.project.settings.runConfigurations {
     'HytaleServer'(org.jetbrains.gradle.ext.Application) {
+
+        def hytaleSourceDir = file("$projectDir/hytale-source")
+        if (!hytaleSourceDir.exists()) {
+            hytaleSourceDir.mkdirs()
+            logger.warn("Run config: No hytale source dir at {}", hytaleSourceDir)
+            return
+        }
+
+        // Create the working directory to run the server if it does not already exist.
+        def serverRunDir = file("$projectDir/run")
+        if (!serverRunDir.exists()) {
+            serverRunDir.mkdirs()
+        }
+
         mainClass = 'com.hypixel.hytale.Main'
         moduleName = project.idea.module.name + '.main'
-        programParameters = "--allow-op --assets=$hytaleHome/Assets.zip"
+        programParameters = "--allow-op --assets=$hytaleSourceDir/Assets.zip"
         if (includes_pack.toBoolean()) {
             programParameters += " --mods=${sourceSets.main.java.srcDirs.first().parentFile.absolutePath}"
         }

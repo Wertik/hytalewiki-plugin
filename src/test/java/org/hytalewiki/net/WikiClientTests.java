@@ -1,6 +1,5 @@
 package org.hytalewiki.net;
 
-import com.hypixel.hytale.logger.backend.HytaleLogManager;
 import org.hytalewiki.net.response.PageObject;
 import org.hytalewiki.net.response.SearchResult;
 import org.junit.jupiter.api.BeforeAll;
@@ -16,8 +15,7 @@ public class WikiClientTests {
 
     @BeforeAll
     public static void beforeAll() {
-        // doesn't work afair
-        System.setProperty("java.util.logging.manager", HytaleLogManager.class.getName());
+        //
     }
 
     @Test
