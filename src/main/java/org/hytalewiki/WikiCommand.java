@@ -117,12 +117,22 @@ public class WikiCommand extends AbstractAsyncCommand {
                     // String extra quotes when using "Hello world" syntax for string arguments
                     .replace("\"", "");
 
-            // todo: try and look for an item with the term as an id, search for the display name
-            // todo: if there's an in-game item with the name, invite the user to create it
-
+            String query = term;
             SearchResult result;
+
+            Item existingItem = Item.getAssetStore().getAssetMap().getAsset(term);
+
+            boolean transformed = false;
+
+            if (existingItem != null) {
+                // Item exists, which means the term was an in-game ID.
+                // We use display names on the wiki.
+                query = this.parent.getDisplayName(existingItem);
+                transformed = true;
+            }
+
             try {
-                result = this.parent.client.search(term, 10);
+                result = this.parent.client.search(query, 10);
             } catch (RequestException e) {
                 return CompletableFuture.failedFuture(e);
             }
@@ -130,9 +140,15 @@ public class WikiCommand extends AbstractAsyncCommand {
             final SearchEntry exactMatch = parent.findExactMatch(result, term);
 
             Message message = parent.makeHeader("Results");
-            if (exactMatch == null) {
-                message.insert(this.parent.makeCreateNotice(term)).insert(Message.raw("\n"));
+
+            if (transformed) {
+                message.insert(this.parent.makeQueryChangeNotice(query)).insert("\n");
             }
+
+            if (exactMatch == null) {
+                message.insert(this.parent.makeCreateNotice(query)).insert("\n");
+            }
+
             message.insert(parent.makeResultList(result.getPages()));
 
             context.sendMessage(message);
@@ -161,19 +177,41 @@ public class WikiCommand extends AbstractAsyncCommand {
                     // String extra quotes when using "Hello world" syntax for string arguments
                     .replace("\"", "");
 
+            Item existingItem = Item.getAssetStore().getAssetMap().getAsset(key);
+
+            String query = key;
+
+            boolean transformed = false;
+
+            if (existingItem != null) {
+                // Item exists, which means the term was an in-game ID.
+                // We use display names on the wiki.
+
+                // todo: expand to other ID types as well
+
+                query = this.parent.getDisplayName(existingItem);
+                transformed = true;
+            }
+
             PageObject page;
             try {
-                page = client.page(key);
+                page = client.page(query);
             } catch (RequestException e) {
                 return CompletableFuture.failedFuture(e);
             }
 
+            Message message = Message.empty();
+
+            if (transformed) {
+                message.insert(this.parent.makeQueryChangeNotice(query)).insert("\n");
+            }
+
             if (page == null || page.getKey() == null) {
-                context.sendMessage(makeCreateNotice(key));
+                context.sendMessage(message.insert(makeCreateNotice(key)));
                 return CompletableFuture.completedFuture(null);
             }
 
-            context.sendMessage(this.parent.makeResultRow(page.getTitle(), page.getKey()));
+            context.sendMessage(message.insert(this.parent.makeResultRow(page.getTitle(), page.getKey())));
             return CompletableFuture.completedFuture(null);
         }
     }
@@ -232,6 +270,14 @@ public class WikiCommand extends AbstractAsyncCommand {
                 Message.raw("\" doesn't exist yet.").color(Color.WHITE),
                 Message.raw(" "),
                 Message.raw("[ Create ]").color(Colors.HYPIXEL_BUTTON_COLOR).link(client.getEditPageUrl(key))
+        );
+    }
+
+    private Message makeQueryChangeNotice(String query) {
+        return Message.join(
+                Message.raw("Query changed to \"").color(Color.lightGray),
+                Message.raw(query).color(Color.CYAN),
+                Message.raw("\".").color(Color.lightGray)
         );
     }
 
