@@ -19,6 +19,7 @@ import org.hytalewiki.net.response.SearchResult;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -36,6 +37,8 @@ public class WikiCommand extends AbstractAsyncCommand {
 
         this.setPermissionGroup(GameMode.Adventure);
 
+        this.requirePermission("hytalewiki.wiki");
+
         this.addSubCommand(new WikiPageCommand(this));
         this.addSubCommand(new WikiHandCommand(this));
         this.addUsageVariant(new WikiSearchCommand(this));
@@ -47,6 +50,8 @@ public class WikiCommand extends AbstractAsyncCommand {
         WikiHandCommand(WikiCommand command) {
             super("hand", "Provide a link to the wiki page for the item in hand.");
             this.parent = command;
+
+            this.requirePermission("hytalewiki.wiki.hand");
         }
 
         @NonNullDecl
@@ -98,6 +103,8 @@ public class WikiCommand extends AbstractAsyncCommand {
             super("Search for a term on the wiki.");
             this.parent = command;
 
+            this.requirePermission("hytalewiki.wiki.search");
+
             this.termArg = this.withRequiredArg("term", "Term to search for.", ArgTypes.STRING);
         }
 
@@ -142,7 +149,7 @@ public class WikiCommand extends AbstractAsyncCommand {
             super("page", "Open a wiki page by exact key.");
             this.parent = command;
 
-            this.setPermissionGroup(GameMode.Adventure);
+            this.requirePermission("hytalewiki.wiki.page");
 
             this.keyArg = this.withRequiredArg("key", "The key to search for.", ArgTypes.STRING);
         }
@@ -174,7 +181,6 @@ public class WikiCommand extends AbstractAsyncCommand {
     @NonNullDecl
     @Override
     protected CompletableFuture<Void> executeAsync(@NonNullDecl CommandContext context) {
-
         // Link to the base wiki page
 
         context.sendMessage(Message.join(
@@ -231,8 +237,14 @@ public class WikiCommand extends AbstractAsyncCommand {
 
     private Message makeResultList(List<SearchEntry> entries) {
         Message builder = Message.empty();
-        for (SearchEntry entry : entries) {
-            builder.insert(makeResultRow(entry)).insert(Message.raw("\n"));
+        for (Iterator<SearchEntry> iterator = entries.iterator(); iterator.hasNext(); ) {
+            SearchEntry entry = iterator.next();
+            builder.insert(makeResultRow(entry));
+
+            // newline after row until the last one (server adds the last one automatically)
+            if (iterator.hasNext()) {
+                builder.insert(Message.raw("\n"));
+            }
         }
         return builder;
     }
