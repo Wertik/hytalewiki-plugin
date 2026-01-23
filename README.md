@@ -9,12 +9,17 @@ Drawbacks:
 
 ## Commands
 
-| Command                            | Description                                                                                                        |
-|------------------------------------|--------------------------------------------------------------------------------------------------------------------|
-| `/wiki`                            | provides a base link to the wiki                                                                                   |
-| `/wiki hand`                       | open page for item in hand                                                                                         |
-| `/wiki <search term>`              | search the wiki for the most relevant entries, looks for exact matches; if exact match and `--ui`, open in-game UI |
-| `/wiki page <page key/page title>` | open the page directly with no search                                                                              |
+| Command                            | Description                                                                                                        | Permission               |
+|------------------------------------|--------------------------------------------------------------------------------------------------------------------|--------------------------|
+| `/wiki`                            | provides a base link to the wiki                                                                                   | `hytalewiki.wiki`        |
+| `/wiki hand`                       | open page for item in hand                                                                                         | `hytalewiki.wiki.hand`   |
+| `/wiki <search term>`              | search the wiki for the most relevant entries, looks for exact matches; if exact match and `--ui`, open in-game UI | `hytalewiki.wiki.search` |
+| `/wiki page <page key/page title>` | open the page directly with no search                                                                              | `hytalewiki.wiki.page`   |
+
+## Notes
+
+If the search term or page title matches an in-game item ID exactly, it gets translated into the item's display name for
+the search. This is because hytalewiki.org uses display names for page keys instead of IDs.
 
 ## Showcase
 
